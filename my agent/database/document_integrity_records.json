@@ -1,0 +1,123 @@
+{
+  "documents": {
+    "upload_8df72f0bde0abf7d_b190ccd0": {
+      "document_id": "upload_8df72f0bde0abf7d_b190ccd0",
+      "file_id": "upload_8df72f0bde0abf7d_b190ccd0",
+      "task_id": null,
+      "execution_id": null,
+      "user_id": "local_user",
+      "filename": "sha256_smoke_test_8df72f0bde0abf7d.txt",
+      "content_type": "text/plain",
+      "format": "txt",
+      "size_bytes": 33,
+      "file_size": 33,
+      "sha256": "8df72f0bde0abf7dedd74eaa9b4bc9e683cde1537d0df39ace88f16ea55f1a1e",
+      "algorithm": "SHA-256",
+      "storage_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\sha256_smoke_test_8df72f0bde0abf7d.txt",
+      "local_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\sha256_smoke_test_8df72f0bde0abf7d.txt",
+      "version": 1,
+      "status": "VERIFIED",
+      "integrity": "VERIFIED",
+      "created_at": "2026-08-22T17:42:27.383871",
+      "updated_at": "2026-08-22T17:42:27.383871"
+    },
+    "upload_7c8a79255ed7c243_c0106a4f": {
+      "document_id": "upload_7c8a79255ed7c243_c0106a4f",
+      "file_id": "upload_7c8a79255ed7c243_c0106a4f",
+      "task_id": null,
+      "execution_id": null,
+      "user_id": "local_user",
+      "filename": "short-research-paper-example_7c8a79255ed7c243.pdf",
+      "content_type": "application/pdf",
+      "format": "pdf",
+      "size_bytes": 3595166,
+      "file_size": 3595166,
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "algorithm": "SHA-256",
+      "storage_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\short-research-paper-example_7c8a79255ed7c243.pdf",
+      "local_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\short-research-paper-example_7c8a79255ed7c243.pdf",
+      "version": 1,
+      "status": "VERIFIED",
+      "integrity": "VERIFIED",
+      "created_at": "2026-08-22T19:51:12.593373",
+      "updated_at": "2026-08-22T19:51:12.593373"
+    },
+    "upload_7c8a79255ed7c243_1d6317ed": {
+      "document_id": "upload_7c8a79255ed7c243_1d6317ed",
+      "file_id": "upload_7c8a79255ed7c243_1d6317ed",
+      "task_id": null,
+      "execution_id": null,
+      "user_id": "local_user",
+      "filename": "short-research-paper-example_7c8a79255ed7c243.pdf",
+      "content_type": "application/pdf",
+      "format": "pdf",
+      "size_bytes": 3595166,
+      "file_size": 3595166,
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "algorithm": "SHA-256",
+      "storage_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\short-research-paper-example_7c8a79255ed7c243.pdf",
+      "local_path": "C:\\Users\\Asiya Fathima\\Downloads\\my agent\\my agent\\uploads\\short-research-paper-example_7c8a79255ed7c243.pdf",
+      "version": 1,
+      "status": "VERIFIED",
+      "integrity": "VERIFIED",
+      "created_at": "2026-08-22T23:45:35.578567",
+      "updated_at": "2026-08-22T23:45:35.578567"
+    }
+  },
+  "events": [
+    {
+      "event": "FILE_HASH_CREATED",
+      "document_id": "upload_8df72f0bde0abf7d_b190ccd0",
+      "algorithm": "SHA-256",
+      "sha256": "8df72f0bde0abf7dedd74eaa9b4bc9e683cde1537d0df39ace88f16ea55f1a1e",
+      "timestamp": "2026-08-22T17:42:27.384048",
+      "user_id": "local_user",
+      "task_id": null
+    },
+    {
+      "event": "FILE_INTEGRITY_VERIFIED",
+      "document_id": "upload_8df72f0bde0abf7d_b190ccd0",
+      "algorithm": "SHA-256",
+      "sha256": "8df72f0bde0abf7dedd74eaa9b4bc9e683cde1537d0df39ace88f16ea55f1a1e",
+      "timestamp": "2026-08-22T17:42:27.384054",
+      "user_id": "local_user",
+      "task_id": null
+    },
+    {
+      "event": "FILE_HASH_CREATED",
+      "document_id": "upload_7c8a79255ed7c243_c0106a4f",
+      "algorithm": "SHA-256",
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "timestamp": "2026-08-22T19:51:12.594113",
+      "user_id": "local_user",
+      "task_id": null
+    },
+    {
+      "event": "FILE_INTEGRITY_VERIFIED",
+      "document_id": "upload_7c8a79255ed7c243_c0106a4f",
+      "algorithm": "SHA-256",
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "timestamp": "2026-08-22T19:51:12.594121",
+      "user_id": "local_user",
+      "task_id": null
+    },
+    {
+      "event": "FILE_HASH_CREATED",
+      "document_id": "upload_7c8a79255ed7c243_1d6317ed",
+      "algorithm": "SHA-256",
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "timestamp": "2026-08-22T23:45:35.579500",
+      "user_id": "local_user",
+      "task_id": null
+    },
+    {
+      "event": "FILE_INTEGRITY_VERIFIED",
+      "document_id": "upload_7c8a79255ed7c243_1d6317ed",
+      "algorithm": "SHA-256",
+      "sha256": "7c8a79255ed7c243391991198a6a4839f19c3323c7d1f95c645111ff49969498",
+      "timestamp": "2026-08-22T23:45:35.579509",
+      "user_id": "local_user",
+      "task_id": null
+    }
+  ]
+}
