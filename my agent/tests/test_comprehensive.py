@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Comprehensive Test Suite for TASKFINISHER AI
 Tests all major components and functionality
@@ -16,8 +16,8 @@ import zipfile
 # Add project directories to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'tools'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'database'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend', 'tools'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend', 'database'))
 
 
 def test_file_structure():
@@ -37,11 +37,11 @@ def test_file_structure():
     required_dirs = [
         'backend',
         'frontend',
-        'agents',
-        'tools',
+        'backend/agents',
+        'backend/tools',
         'tests',
         'docs',
-        'database',
+        'backend/database',
         'demos'
     ]
     
@@ -80,14 +80,14 @@ def test_python_syntax():
         print("  ✓ main.py imports successfully")
         
         # Test tools
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'tools'))
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
         from tools.web_search_tool import web_search_tool
         from tools.file_processor_tool import file_processor_tool
         from tools.web_scraper_tool import web_scraper_tool
         print("  ✓ All tool modules import successfully")
         
         # Test database
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'database'))
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
         from database.db_manager import db_manager, TaskDatabase
         print("  ✓ Database module imports successfully")
         

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Basic test to verify the TASKFINISHER AI structure
 """
@@ -52,8 +52,9 @@ def test_directories():
         required_dirs = [
             "backend",
             "frontend", 
-            "agents",
-            "tools",
+            "backend/agents",
+            "backend/tools",
+            "backend/database",
             "tests",
             "docs"
         ]
