@@ -8,7 +8,7 @@ import shutil
 import uuid
 from pathlib import Path
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks, status, Query
 from sqlalchemy.orm import Session
 
 from backend.app.config import settings
@@ -28,6 +28,8 @@ from backend.ingestion.chunker import create_page_chunks
 from backend.rag.embeddings import get_embedding_service
 from backend.rag.vector_store import get_vector_store
 from backend.rag.bm25_index import get_bm25_manager
+from backend.extraction.paper_extractor import PaperExtractor
+from backend.extraction.paper_schema import PaperRecordSchema
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -429,3 +431,41 @@ def delete_document(
     db.commit()
 
     return {"status": "ok", "message": f"Document {document_id} deleted successfully."}
+
+
+@router.get("/{document_id}/record", response_model=PaperRecordSchema)
+@router.get("/{document_id}/record/", response_model=PaperRecordSchema)
+def get_document_record(
+    document_id: str,
+    workspace_id: Optional[str] = Query(None, description="Workspace isolation scope"),
+    force_refresh: bool = Query(False, description="Force re-extraction"),
+    db: Session = Depends(get_db),
+):
+    """
+    Retrieves the structured PaperRecord for a document.
+    Extracts on demand if not yet extracted.
+    """
+    query = db.query(Document).filter(Document.id == document_id)
+    if workspace_id:
+        query = query.filter(Document.workspace_id == workspace_id)
+    doc = query.first()
+
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document {document_id} not found."
+        )
+
+    extractor = PaperExtractor()
+    try:
+        record = extractor.extract_from_document(
+            document_id=doc.document_id,
+            workspace_id=doc.workspace_id,
+            force_refresh=force_refresh,
+        )
+        return record
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate structured paper record: {str(exc)}"
+        )

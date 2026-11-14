@@ -179,20 +179,6 @@ class PaperRecord(Base):
 
     id = synonym("record_id")
     primary_domain = synonym("research_domain")
-    research_domain = Column(String(128), nullable=True)
-    title = Column(String(512), nullable=True)
-    objective = Column(Text, nullable=True)
-    problem_statement = Column(Text, nullable=True)
-    methodology_json = Column(Text, nullable=True)
-    evaluation_json = Column(Text, nullable=True)
-    results_json = Column(Text, nullable=True)
-    strengths_json = Column(Text, nullable=True)
-    limitations_json = Column(Text, nullable=True)
-    future_work_json = Column(Text, nullable=True)
-    conclusion_json = Column(Text, nullable=True)
-    analysis_json = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=_now, nullable=False)
-    updated_at = Column(DateTime, default=_now, onupdate=_now, nullable=False)
 
     document = relationship("Document", back_populates="paper_records")
 
