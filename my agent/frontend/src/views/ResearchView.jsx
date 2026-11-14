@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   IconSearch,
   IconShieldCheck,
@@ -9,6 +9,7 @@ import {
   IconBookOpen,
   IconRefreshCw,
   IconZap,
+  IconChevronDown,
 } from '../components/icons'
 
 const SECTIONS = [
@@ -47,6 +48,23 @@ export default function ResearchView({
   const [searchResults, setSearchResults] = useState(null)
   const [searchError, setSearchError] = useState('')
   const [expandedChunkId, setExpandedChunkId] = useState(null)
+  const [sectionDropdownOpen, setSectionDropdownOpen] = useState(false)
+  const sectionMenuRef = useRef(null)
+
+  // Close section dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sectionMenuRef.current && !sectionMenuRef.current.contains(event.target)) {
+        setSectionDropdownOpen(false)
+      }
+    }
+    if (sectionDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [sectionDropdownOpen])
 
   const currentWorkspace = workspaceId || 'default_workspace'
 
@@ -228,22 +246,56 @@ export default function ResearchView({
 
             {/* Controls Bar: Section filter, Reranker toggle, Parent expansion */}
             <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs">
-              {/* Section Pills */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-zinc-500 font-mono text-[11px] mr-1">Section:</span>
-                {SECTIONS.map((sec) => (
+              {/* Section Filter Popover Dropdown */}
+              <div className="relative" ref={sectionMenuRef}>
+                <div className="flex items-center gap-2">
+                  <span className="text-zinc-500 font-mono text-[11px]">Section:</span>
                   <button
-                    key={sec.id}
-                    onClick={() => setSelectedSection(sec.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
-                      selectedSection === sec.id
-                        ? 'bg-[#FF6A00] text-white font-bold shadow'
-                        : 'bg-white/5 text-zinc-400 hover:text-white border border-white/5'
-                    }`}
+                    type="button"
+                    onClick={() => setSectionDropdownOpen((prev) => !prev)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs transition-all shadow-sm focus:outline-none focus:border-[#FF6A00]"
                   >
-                    {sec.label}
+                    <IconFilter className="w-3.5 h-3.5 text-[#FF6A00]" />
+                    <span className="font-semibold text-zinc-200">
+                      {SECTIONS.find((s) => s.id === selectedSection)?.label || 'All Sections'}
+                    </span>
+                    <IconChevronDown
+                      className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${
+                        sectionDropdownOpen ? 'rotate-180 text-white' : ''
+                      }`}
+                    />
                   </button>
-                ))}
+                </div>
+
+                {/* Popover Menu */}
+                {sectionDropdownOpen && (
+                  <div className="absolute left-14 top-full mt-2 w-52 bg-zinc-900/95 backdrop-blur-xl border border-white/15 rounded-xl shadow-2xl p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-2.5 py-1 text-[10px] font-mono text-zinc-400 uppercase tracking-wider border-b border-white/5 mb-1">
+                      Filter Target Section
+                    </div>
+                    {SECTIONS.map((sec) => {
+                      const isSelected = selectedSection === sec.id
+                      return (
+                        <button
+                          key={sec.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSection(sec.id)
+                            setSectionDropdownOpen(false)
+                          }}
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all text-left ${
+                            isSelected
+                              ? 'bg-[#FF6A00] text-white font-bold shadow'
+                              : 'text-zinc-300 hover:text-white hover:bg-white/10'
+                          }`}
+                        >
+                          <span>{sec.label}</span>
+                          {isSelected && <IconCheck className="w-3.5 h-3.5 shrink-0" />}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Toggles */}
