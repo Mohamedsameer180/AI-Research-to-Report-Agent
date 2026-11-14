@@ -189,3 +189,4 @@ def create_page_chunks(
                 all_chunks.append(table_chunk)
 
     return all_chunks
+

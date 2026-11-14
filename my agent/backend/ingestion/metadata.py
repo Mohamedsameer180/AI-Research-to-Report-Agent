@@ -173,3 +173,4 @@ def extract_paper_metadata(pages_data: List[Dict[str, Any]], filename: str) -> D
         "reference_count": len(references),
         "references": references,
     }
+

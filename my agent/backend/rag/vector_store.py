@@ -141,3 +141,4 @@ def get_vector_store() -> ChromaVectorStore:
     if _VECTOR_STORE_INSTANCE is None:
         _VECTOR_STORE_INSTANCE = ChromaVectorStore()
     return _VECTOR_STORE_INSTANCE
+

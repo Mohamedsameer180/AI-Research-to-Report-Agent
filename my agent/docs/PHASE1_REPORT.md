@@ -151,3 +151,4 @@ my agent/backend/
 | 13 SQLAlchemy Tables | **DONE** | Verified in `research_platform.db` |
 | Pytest Test Suite | **DONE** | 8/8 tests passed |
 | Legacy Regression Tests | **DONE** | 8/8 test groups passed |
+

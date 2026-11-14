@@ -37,6 +37,7 @@ from database.firebase_service import firebase_service
 from taskfinisher_orchestrator import TaskFinisherOrchestrator
 from backend.app.db.database import init_db
 from backend.app.api.documents import router as documents_router
+from backend.app.api.retrieval import router as retrieval_router
 
 logger = logging.getLogger("taskfinisher.api")
 
@@ -52,8 +53,9 @@ try:
 except Exception as e:
     logger.warning("Could not initialize TP01 DB: %s", e)
 
-# Mount TP01 Document Engine routes
+# Mount TP01 Document & Retrieval Engine routes
 app.include_router(documents_router, prefix="/api")
+app.include_router(retrieval_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,

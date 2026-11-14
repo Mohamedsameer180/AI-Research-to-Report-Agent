@@ -7,6 +7,7 @@ and workspace isolation.
 import os
 import sys
 import tempfile
+import uuid
 from pathlib import Path
 import pytest
 import pymupdf
@@ -291,7 +292,7 @@ def test_document_lifecycle_api(tmp_path):
     client = TestClient(app)
     pdf_path = create_sample_two_column_pdf(tmp_path / "lifecycle_test.pdf")
 
-    workspace = "test_workspace_lifecycle"
+    workspace = f"test_workspace_lifecycle_{uuid.uuid4().hex[:8]}"
     user = "test_user_01"
 
     with open(pdf_path, "rb") as f:
@@ -340,3 +341,4 @@ def test_document_lifecycle_api(tmp_path):
     # Verify deleted
     get_del = client.get(f"/api/documents/{doc_id}")
     assert get_del.status_code == 404
+

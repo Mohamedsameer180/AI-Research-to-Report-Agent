@@ -9,6 +9,11 @@ from backend.app.schemas.document import (
     DocumentListResponse,
     PaperMetadataSchema,
 )
+from backend.app.schemas.retrieval import (
+    SearchRequest,
+    SearchResponse,
+    RetrievedChunk,
+)
 
 __all__ = [
     "DocumentUploadResponse",
@@ -17,4 +22,7 @@ __all__ = [
     "DocumentResponse",
     "DocumentListResponse",
     "PaperMetadataSchema",
+    "SearchRequest",
+    "SearchResponse",
+    "RetrievedChunk",
 ]

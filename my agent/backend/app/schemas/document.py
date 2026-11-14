@@ -79,3 +79,4 @@ class DocumentListResponse(BaseModel):
     documents: List[DocumentResponse]
     total: int
     workspace_id: str
+

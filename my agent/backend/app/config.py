@@ -52,3 +52,4 @@ settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 settings.CHROMA_PERSIST_DIR.mkdir(parents=True, exist_ok=True)
 settings.BM25_INDEX_DIR.mkdir(parents=True, exist_ok=True)
+
