@@ -117,3 +117,4 @@ def generate_multi_queries(query: str, max_variations: int = 3) -> List[str]:
             seen.add(syn_query.lower())
 
     return queries[:max_variations]
+

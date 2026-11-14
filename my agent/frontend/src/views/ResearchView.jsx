@@ -1,226 +1,385 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import {
+  IconSearch,
   IconShieldCheck,
   IconExternalLink,
   IconCheck,
   IconFileText,
+  IconFilter,
+  IconBookOpen,
+  IconRefreshCw,
+  IconZap,
 } from '../components/icons'
 
-const getEvidence = (taskResult) => taskResult?.evidence || []
+const SECTIONS = [
+  { id: 'all', label: 'All Sections' },
+  { id: 'abstract', label: 'Abstract' },
+  { id: 'introduction', label: 'Introduction' },
+  { id: 'methodology', label: 'Methodology' },
+  { id: 'experiments', label: 'Experiments' },
+  { id: 'results', label: 'Results' },
+  { id: 'limitations', label: 'Limitations' },
+  { id: 'conclusion', label: 'Conclusion' },
+]
 
-const buildSources = (taskResult) => {
-  const sourceMap = new Map()
+const SAMPLE_QUERIES = [
+  'What are the primary limitations reported by the authors?',
+  'What empirical methodology and datasets were evaluated?',
+  'How do the results compare against previous baseline models?',
+  'What theoretical claims or mathematical frameworks are proposed?',
+]
 
-  getEvidence(taskResult).forEach((item) => {
-    const metadata = item.metadata || {}
-    const key = metadata.url || item.source || item.id
-    const existing = sourceMap.get(key) || {
-      id: key,
-      name: item.source || metadata.title || item.type || 'Evidence source',
-      organization: metadata.domain || metadata.organization || item.source || 'TaskFinisher backend',
-      type: item.type || 'evidence',
-      url: metadata.url || '',
-      reliability: metadata.reliability || metadata.confidence || 100,
-      relevance: metadata.relevance || 'Collected by backend agent',
-      hash: item.id,
-      claims: [],
+export default function ResearchView({
+  taskResult,
+  apiBaseUrl = 'http://127.0.0.1:8000',
+  workspaceId = 'default_workspace',
+  setWorkspaceId,
+  onNavigate,
+  onPlaySound,
+}) {
+  const [activeTab, setActiveTab] = useState('search') // 'search' | 'evidence'
+  const [query, setQuery] = useState('')
+  const [selectedSection, setSelectedSection] = useState('all')
+  const [useReranker, setUseReranker] = useState(true)
+  const [expandParent, setExpandParent] = useState(true)
+  const [topK, setTopK] = useState(5)
+  const [searching, setSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState(null)
+  const [searchError, setSearchError] = useState('')
+  const [expandedChunkId, setExpandedChunkId] = useState(null)
+
+  const currentWorkspace = workspaceId || 'default_workspace'
+
+  // Execute Hybrid RAG Search
+  const handleSearch = async (searchQuery = query) => {
+    const q = searchQuery.trim()
+    if (!q) return
+    setSearching(true)
+    setSearchError('')
+    onPlaySound?.('click')
+
+    try {
+      const payload = {
+        query: q,
+        workspace_id: currentWorkspace,
+        top_k: Number(topK),
+        candidate_k: 20,
+        sections: selectedSection !== 'all' ? [selectedSection] : null,
+        expand_parent: expandParent,
+        use_reranker: useReranker,
+      }
+
+      const res = await fetch(`${apiBaseUrl}/api/retrieval/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.detail || 'Search failed')
+      }
+
+      const data = await res.json()
+      setSearchResults(data)
+      onPlaySound?.('complete')
+    } catch (err) {
+      setSearchError(err.message || 'Error executing hybrid search')
+    } finally {
+      setSearching(false)
     }
+  }
 
-    existing.claims.push(item.content)
-    sourceMap.set(key, existing)
-  })
-
-  return Array.from(sourceMap.values())
-}
-
-export default function ResearchView({ taskResult, onNavigate, onPlaySound }) {
-  const sources = useMemo(() => buildSources(taskResult), [taskResult])
-  const evidence = getEvidence(taskResult)
-  const [selectedSourceId, setSelectedSourceId] = useState(null)
-  const selectedSource = sources.find((source) => source.id === selectedSourceId) || sources[0]
+  // Legacy task evidence sources
+  const evidenceList = taskResult?.evidence || []
 
   return (
     <div className="space-y-6 pb-12">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* View Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#FF6A00]" />
             <span className="text-xs font-semibold tracking-wider text-[#FF8A00] uppercase font-mono">
-              Intelligence Workspace
+              TP01 Hybrid Intelligence
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight mt-1">
-            Research & Source Verification
+          <h1 className="text-2xl font-bold text-white tracking-tight mt-1 flex items-center gap-3">
+            <IconSearch className="w-6 h-6 text-[#FF6A00]" />
+            Hybrid Retrieval & Cross-Encoder Deep Search
           </h1>
+          <p className="text-sm text-zinc-400 mt-0.5">
+            Query across workspace papers with dense embeddings, BM25Plus, and MS-MARCO Cross-Encoder reranking.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-xs text-zinc-400 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          <span>{sources.length} source(s) from the active backend task</span>
+        {/* Workspace & Sub-tab switcher */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 px-3 py-1.5 rounded-xl font-mono text-xs">
+            <span className="text-zinc-500">Workspace:</span>
+            <input
+              type="text"
+              value={currentWorkspace}
+              onChange={(e) => setWorkspaceId && setWorkspaceId(e.target.value)}
+              className="bg-transparent text-white font-semibold focus:outline-none w-32 border-b border-transparent focus:border-[#FF6A00]"
+              placeholder="workspace_id"
+            />
+          </div>
+
+          <div className="flex rounded-xl bg-white/5 p-1 border border-white/10">
+            <button
+              onClick={() => setActiveTab('search')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'search'
+                  ? 'bg-[#FF6A00] text-white shadow'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Hybrid Search
+            </button>
+            <button
+              onClick={() => setActiveTab('evidence')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                activeTab === 'evidence'
+                  ? 'bg-[#FF6A00] text-white shadow'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Task Evidence ({evidenceList.length})
+            </button>
+          </div>
         </div>
       </div>
 
-      {!taskResult || sources.length === 0 ? (
-        <section className="glass-panel p-6 rounded-2xl border border-white/10">
-          <h2 className="text-base font-bold text-white">No research evidence yet</h2>
-          <p className="text-sm text-zinc-400 mt-2">
-            Run a task through the backend to populate real sources, claims, and verification evidence.
-          </p>
-        </section>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-4 space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
-                Source Catalog
-              </span>
-              <span className="text-[10px] font-mono text-zinc-500">Backend Evidence</span>
-            </div>
-
-            <div className="space-y-3 max-h-[720px] overflow-y-auto pr-1">
-              {sources.map((source, index) => {
-                const isSelected = selectedSource?.id === source.id
-
-                return (
-                  <article
-                    key={source.id}
-                    onClick={() => {
-                      onPlaySound?.('hover')
-                      setSelectedSourceId(source.id)
-                    }}
-                    className={`p-4 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#FF6A00]/10 border-[#FF6A00] shadow-[0_0_20px_rgba(255,106,0,0.15)]'
-                        : 'bg-black/40 border-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-mono font-bold text-[#FF8A00]">
-                        SOURCE #{String(index + 1).padStart(2, '0')}
-                      </span>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-bold flex items-center gap-1">
-                        <IconCheck className="w-3 h-3" />
-                        CAPTURED
-                      </span>
-                    </div>
-
-                    <h4 className="text-xs font-bold text-white leading-snug">
-                      {source.name}
-                    </h4>
-                    <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                      {source.organization}
-                    </p>
-
-                    <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">
-                      <span className="text-zinc-500 font-mono">
-                        Evidence items: <strong className="text-zinc-300">{source.claims.length}</strong>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onPlaySound?.('click')
-                          onNavigate('evidence')
-                        }}
-                        className="text-[#FF8A00] hover:text-white font-mono text-[10px] font-semibold underline flex items-center gap-1"
-                      >
-                        View Evidence
-                      </button>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 space-y-4">
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-4 h-full">
-              <div className="flex items-center justify-between pb-3 border-b border-white/5">
-                <div className="flex items-center gap-2">
-                  <IconFileText className="w-4 h-4 text-[#FF8A00]" />
-                  <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                    Source Inspection & Claims
-                  </h3>
-                </div>
-                <span className="text-[10px] font-mono text-zinc-500">
-                  {selectedSource?.hash}
-                </span>
+      {activeTab === 'search' ? (
+        <div className="space-y-5">
+          {/* Main Search Bar Card */}
+          <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-4 shadow-xl">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleSearch()
+              }}
+              className="flex gap-2"
+            >
+              <div className="relative flex-1">
+                <IconSearch className="w-5 h-5 absolute left-3.5 top-3.5 text-zinc-400" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Ask any research question across workspace papers (e.g. 'What are the reported limitations in scaling?')..."
+                  className="w-full bg-black/50 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF6A00] transition-all font-sans"
+                />
               </div>
 
-              <div className="p-4 rounded-xl bg-black/50 border border-white/5 space-y-2">
-                <h2 className="text-base font-bold text-white">{selectedSource.name}</h2>
-                <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
-                  <span>Source: <strong className="text-zinc-200">{selectedSource.organization}</strong></span>
-                  <span>Type: <strong className="text-zinc-200">{selectedSource.type}</strong></span>
-                </div>
-                {selectedSource.url && (
-                  <div className="text-[11px] font-mono text-[#FF8A00] truncate flex items-center gap-1">
-                    <IconExternalLink className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{selectedSource.url}</span>
-                  </div>
+              <button
+                type="submit"
+                disabled={searching || !query.trim()}
+                className="px-6 py-3 rounded-xl bg-[#FF6A00] hover:bg-[#FF8A00] disabled:opacity-50 text-white font-semibold text-sm transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(255,106,0,0.3)] shrink-0"
+              >
+                {searching ? (
+                  <IconRefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <IconZap className="w-4 h-4" />
                 )}
-              </div>
+                <span>Search Papers</span>
+              </button>
+            </form>
 
-              <div className="space-y-2">
-                <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold block">
-                  Captured Claims:
-                </span>
-
-                <div className="space-y-2">
-                  {selectedSource.claims.map((claim, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-black/30 border border-white/5 flex items-start gap-2.5 text-xs text-zinc-200 leading-relaxed">
-                      <span className="text-[#FF8A00] font-mono font-bold mt-0.5">[{idx + 1}]</span>
-                      <span>{claim}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 flex items-center justify-between text-xs font-mono">
-                <div className="flex items-center gap-2 text-emerald-400">
-                  <IconShieldCheck className="w-4 h-4" />
-                  <span>Evidence ID:</span>
-                </div>
-                <span className="text-zinc-400 text-[11px]">{selectedSource.hash}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-3 space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold">
-                Evidence Rail
-              </span>
-              <span className="text-[10px] font-mono text-[#FF8A00]">{evidence.length} items</span>
-            </div>
-
-            <div className="space-y-2 max-h-[720px] overflow-y-auto pr-1">
-              {evidence.map((ev) => (
-                <div
-                  key={ev.id}
+            {/* Quick Query Pills */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-zinc-500 font-mono text-[11px]">Suggested Questions:</span>
+              {SAMPLE_QUERIES.map((sq, idx) => (
+                <button
+                  key={idx}
                   onClick={() => {
-                    onPlaySound?.('hover')
-                    onNavigate('evidence')
+                    setQuery(sq)
+                    handleSearch(sq)
                   }}
-                  className="p-3 rounded-xl bg-black/40 border border-white/5 hover:border-[#FF6A00]/40 transition-all cursor-pointer group"
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white transition-colors border border-white/5 truncate max-w-xs"
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-mono font-bold text-white group-hover:text-[#FF8A00]">
-                      {ev.id}
-                    </span>
-                    <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded">
-                      {ev.type}
-                    </span>
-                  </div>
-                  <div className="text-xs font-bold text-zinc-300 truncate">
-                    {ev.source}
-                  </div>
-                  <p className="text-[11px] text-zinc-500 truncate mt-1">
-                    {ev.content}
-                  </p>
-                </div>
+                  {sq}
+                </button>
               ))}
             </div>
+
+            {/* Controls Bar: Section filter, Reranker toggle, Parent expansion */}
+            <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs">
+              {/* Section Pills */}
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-zinc-500 font-mono text-[11px] mr-1">Section:</span>
+                {SECTIONS.map((sec) => (
+                  <button
+                    key={sec.id}
+                    onClick={() => setSelectedSection(sec.id)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all ${
+                      selectedSection === sec.id
+                        ? 'bg-[#FF6A00] text-white font-bold shadow'
+                        : 'bg-white/5 text-zinc-400 hover:text-white border border-white/5'
+                    }`}
+                  >
+                    {sec.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Toggles */}
+              <div className="flex items-center gap-4 font-mono text-[11px]">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-zinc-300 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={useReranker}
+                    onChange={(e) => setUseReranker(e.target.checked)}
+                    className="accent-[#FF6A00] rounded"
+                  />
+                  <span>Cross-Encoder (ms-marco)</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer select-none text-zinc-300 hover:text-white">
+                  <input
+                    type="checkbox"
+                    checked={expandParent}
+                    onChange={(e) => setExpandParent(e.target.checked)}
+                    className="accent-[#FF6A00] rounded"
+                  />
+                  <span>Parent Section Context</span>
+                </label>
+
+                <div className="flex items-center gap-1 text-zinc-400">
+                  <span>Top K:</span>
+                  <select
+                    value={topK}
+                    onChange={(e) => setTopK(e.target.value)}
+                    className="bg-black/50 border border-white/10 text-white rounded px-1.5 py-0.5 text-xs focus:outline-none"
+                  >
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {searchError && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl">
+              {searchError}
+            </div>
+          )}
+
+          {/* Results Feed */}
+          {searchResults && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+                <span>Found {searchResults.total_found} verified citation passages</span>
+                <span>Workspace: {searchResults.workspace_id}</span>
+              </div>
+
+              {searchResults.results.length === 0 ? (
+                <div className="p-8 text-center bg-white/[0.02] border border-white/10 rounded-2xl text-zinc-400 text-xs">
+                  No matching passages found. Ensure research papers are uploaded to workspace "{currentWorkspace}".
+                </div>
+              ) : (
+                searchResults.results.map((r, idx) => {
+                  const isExpanded = expandedChunkId === r.chunk_id
+                  return (
+                    <div
+                      key={r.chunk_id || idx}
+                      className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 space-y-3 transition-all hover:border-white/20"
+                    >
+                      {/* Result Top Metadata Bar */}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-lg bg-[#FF6A00]/20 text-[#FF6A00] font-mono text-xs font-bold flex items-center justify-center">
+                            #{idx + 1}
+                          </span>
+                          <span className="text-xs font-bold text-white tracking-wide">
+                            {r.title || r.filename}
+                          </span>
+                          <span className="text-zinc-500 font-mono text-[11px]">({r.filename})</span>
+                        </div>
+
+                        {/* Page & Section Badges */}
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            PDF Page {r.pdf_page} {r.printed_page !== String(r.pdf_page) && `(p. ${r.printed_page})`}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-lg text-xs font-mono uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            {r.section}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Verbatim Quote Excerpt */}
+                      <div className="bg-black/40 border border-white/5 rounded-xl p-3.5 text-xs text-zinc-200 font-mono leading-relaxed select-text">
+                        <span className="text-[#FF8A00] font-bold mr-1.5">“</span>
+                        {r.text}
+                        <span className="text-[#FF8A00] font-bold ml-1.5">”</span>
+                      </div>
+
+                      {/* Parent Section Context if Expanded */}
+                      {isExpanded && r.parent_text && (
+                        <div className="mt-3 p-4 bg-black/60 border border-[#FF6A00]/20 rounded-xl text-xs text-zinc-300 font-sans space-y-1">
+                          <span className="text-[11px] font-mono text-[#FF8A00] font-semibold block uppercase">
+                            Expanded Section Context:
+                          </span>
+                          <p className="whitespace-pre-wrap leading-relaxed">{r.parent_text}</p>
+                        </div>
+                      )}
+
+                      {/* Bottom Metrics Bar */}
+                      <div className="flex items-center justify-between pt-2 border-t border-white/5 text-xs font-mono text-zinc-400">
+                        <div className="flex items-center gap-4">
+                          {r.rerank_score !== null && (
+                            <span className="text-zinc-300">
+                              Cross-Encoder Logit:{' '}
+                              <strong className="text-emerald-400">{r.rerank_score.toFixed(3)}</strong>
+                            </span>
+                          )}
+                          {r.rrf_score && (
+                            <span className="text-zinc-400">
+                              RRF Score: <strong className="text-blue-400">{r.rrf_score.toFixed(4)}</strong>
+                            </span>
+                          )}
+                        </div>
+
+                        {r.parent_text && (
+                          <button
+                            onClick={() => setExpandedChunkId(isExpanded ? null : r.chunk_id)}
+                            className="text-[#FF8A00] hover:underline font-mono text-[11px]"
+                          >
+                            {isExpanded ? 'Hide Full Section Context' : 'View Full Section Context'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Legacy Task Evidence View */
+        <div className="space-y-4">
+          <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-6">
+            <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              <IconShieldCheck className="w-5 h-5 text-emerald-400" />
+              Active Task Evidence Trail ({evidenceList.length})
+            </h2>
+            {evidenceList.length === 0 ? (
+              <p className="text-xs text-zinc-500 italic">No evidence collected for the current task.</p>
+            ) : (
+              <div className="space-y-2">
+                {evidenceList.map((e, idx) => (
+                  <div key={idx} className="p-3 bg-black/40 rounded-xl border border-white/5 text-xs text-zinc-300 font-mono">
+                    <span className="text-[#FF8A00] font-bold mr-2">[{e.source || 'Evidence'}]:</span>
+                    <span>{e.content || JSON.stringify(e)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

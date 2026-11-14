@@ -38,3 +38,4 @@ class SearchResponse(BaseModel):
     workspace_id: str
     total_found: int
     results: List[RetrievedChunk]
+

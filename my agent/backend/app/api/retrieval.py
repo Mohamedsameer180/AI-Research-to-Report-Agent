@@ -64,3 +64,4 @@ def hybrid_search(
         total_found=len(formatted_results),
         results=formatted_results,
     )
+

@@ -405,3 +405,4 @@ def test_api_search_endpoint():
 
     # Cleanup
     vs.delete_document(ws, "doc_api_search")
+

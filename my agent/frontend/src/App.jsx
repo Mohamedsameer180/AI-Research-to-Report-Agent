@@ -39,6 +39,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [inspectedNode, setInspectedNode] = useState(null)
+  const [workspaceId, setWorkspaceId] = useState('default_workspace')
 
   // Sound triggering helper
   const handlePlaySound = useCallback((type = 'click', force = false) => {
@@ -233,6 +234,9 @@ export default function App() {
           {activePage === 'research' && (
             <ResearchView
               taskResult={taskResult}
+              apiBaseUrl={API_BASE_URL}
+              workspaceId={workspaceId}
+              setWorkspaceId={setWorkspaceId}
               onNavigate={setActivePage}
               onPlaySound={handlePlaySound}
             />
@@ -242,6 +246,9 @@ export default function App() {
             <DocumentsView
               taskResult={taskResult}
               apiBaseUrl={API_BASE_URL}
+              workspaceId={workspaceId}
+              setWorkspaceId={setWorkspaceId}
+              onNavigate={setActivePage}
               onPlaySound={handlePlaySound}
             />
           )}

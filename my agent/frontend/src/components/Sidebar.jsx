@@ -10,15 +10,16 @@ import {
   IconSettings,
   IconLayers,
   IconRefreshCw,
-  IconSparkles
+  IconSparkles,
+  IconBookOpen,
 } from './icons'
 
 export const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: IconCpu, kicker: 'Mission Control' },
   { id: 'tasks', label: 'Tasks', icon: IconZap, kicker: 'Plan & Create' },
   { id: 'activity', label: 'Agent Activity', icon: IconRefreshCw, kicker: 'Live Execution' },
-  { id: 'research', label: 'Research', icon: IconSearch, kicker: 'Source Intel' },
-  { id: 'documents', label: 'Documents', icon: IconFileText, kicker: 'Report Studio' },
+  { id: 'research', label: 'Deep Search', icon: IconSearch, kicker: 'Hybrid RAG & Rerank' },
+  { id: 'documents', label: 'Paper Hub', icon: IconBookOpen, kicker: 'Ingest & Grounding' },
   { id: 'evidence', label: 'Evidence', icon: IconShieldCheck, kicker: 'Audit Ledger' },
   { id: 'history', label: 'Execution History', icon: IconHistory, kicker: 'Archive & Replay' },
   { id: 'analytics', label: 'Analytics', icon: IconBarChart, kicker: 'Telemetry' },
