@@ -1,0 +1,37 @@
+from backend.app.db.database import Base, engine, SessionLocal, get_db, init_db
+from backend.app.db.models import (
+    Document,
+    DocumentPage,
+    DocumentChunk,
+    PaperRecord,
+    Citation,
+    Comparison,
+    Contradiction,
+    ResearchGap,
+    Conversation,
+    Message,
+    AgentRun,
+    Report,
+    EvalResult,
+)
+
+__all__ = [
+    "Base",
+    "engine",
+    "SessionLocal",
+    "get_db",
+    "init_db",
+    "Document",
+    "DocumentPage",
+    "DocumentChunk",
+    "PaperRecord",
+    "Citation",
+    "Comparison",
+    "Contradiction",
+    "ResearchGap",
+    "Conversation",
+    "Message",
+    "AgentRun",
+    "Report",
+    "EvalResult",
+]

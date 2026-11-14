@@ -136,3 +136,4 @@ The audited project originated as **TaskFinisher AI**, a prototype built around 
 3. **LLM Inference:** All generation (extraction, synthesis, Q&A, gap discovery) will be routed to the cloud via Google Gemini API (`gemini-2.0-flash` / `gemini-2.5-pro`), offloading all heavy compute.
 4. **ChromaDB In-Memory vs. Persistent:** ChromaDB will run locally using SQLite persistent client (`chromadb.PersistentClient`), consuming <150 MB RAM for 3–10 research papers.
 5. **PyMuPDF Memory Safety:** PyMuPDF (`fitz`) operates via lightweight C bindings, reading and freeing page streams individually to prevent memory spikes.
+

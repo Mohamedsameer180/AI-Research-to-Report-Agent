@@ -3,11 +3,20 @@ import hashlib
 import html
 import logging
 import re
+import sys
 import uuid
 import zipfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+# Ensure project root and backend dir are in sys.path
+_CURRENT_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _CURRENT_DIR.parent
+if str(_PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_PROJECT_ROOT))
+if str(_CURRENT_DIR) not in sys.path:
+    sys.path.insert(0, str(_CURRENT_DIR))
 
 import uvicorn
 from fastapi import FastAPI, File, Header, HTTPException, Query, UploadFile, WebSocket, WebSocketDisconnect
@@ -26,14 +35,25 @@ from database.document_integrity import (
 )
 from database.firebase_service import firebase_service
 from taskfinisher_orchestrator import TaskFinisherOrchestrator
+from backend.app.db.database import init_db
+from backend.app.api.documents import router as documents_router
 
 logger = logging.getLogger("taskfinisher.api")
 
 app = FastAPI(
     title="TASKFINISHER AI",
-    description="An AI Agent That Actually Finishes the Job",
+    description="An AI Agent That Actually Finishes the Job - TP01 Research Platform",
     version="1.1.0",
 )
+
+# Initialize TP01 Research Database
+try:
+    init_db()
+except Exception as e:
+    logger.warning("Could not initialize TP01 DB: %s", e)
+
+# Mount TP01 Document Engine routes
+app.include_router(documents_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,

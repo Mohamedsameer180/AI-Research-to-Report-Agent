@@ -1,0 +1,14 @@
+.env
+*.db
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+dist/
+.venv/
+uploads/
+outputs/
+**/uploads/
+**/outputs/
+**/chroma_db/
+**/bm25_indices/

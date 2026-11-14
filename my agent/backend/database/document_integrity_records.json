@@ -209,6 +209,27 @@
       "integrity": "VERIFIED",
       "created_at": "2026-11-14T07:47:32.616587",
       "updated_at": "2026-11-14T07:47:32.616587"
+    },
+    "doc_task_fba3122258": {
+      "document_id": "doc_task_fba3122258",
+      "file_id": "doc_task_fba3122258",
+      "task_id": "task_fba3122258",
+      "execution_id": "exec_task_fba3122258",
+      "user_id": "local_user",
+      "filename": "task_fba3122258_report.docx",
+      "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "format": "docx",
+      "size_bytes": 5180,
+      "file_size": 5180,
+      "sha256": "fbecd6c6a086f0a55aaae9a202bf4aac3c03ff2a235c6bd500f3c04b514b6148",
+      "algorithm": "SHA-256",
+      "storage_path": "D:\\my projects\\my agent\\outputs\\task_fba3122258_report.docx",
+      "local_path": "D:\\my projects\\my agent\\outputs\\task_fba3122258_report.docx",
+      "version": 1,
+      "status": "VERIFIED",
+      "integrity": "VERIFIED",
+      "created_at": "2026-11-14T08:17:20.964278",
+      "updated_at": "2026-11-14T08:17:20.964278"
     }
   },
   "events": [
@@ -391,6 +412,24 @@
       "timestamp": "2026-11-14T07:47:32.618587",
       "user_id": "local_user",
       "task_id": null
+    },
+    {
+      "event": "FILE_HASH_CREATED",
+      "document_id": "doc_task_fba3122258",
+      "algorithm": "SHA-256",
+      "sha256": "fbecd6c6a086f0a55aaae9a202bf4aac3c03ff2a235c6bd500f3c04b514b6148",
+      "timestamp": "2026-11-14T08:17:20.964278",
+      "user_id": "local_user",
+      "task_id": "task_fba3122258"
+    },
+    {
+      "event": "FILE_INTEGRITY_VERIFIED",
+      "document_id": "doc_task_fba3122258",
+      "algorithm": "SHA-256",
+      "sha256": "fbecd6c6a086f0a55aaae9a202bf4aac3c03ff2a235c6bd500f3c04b514b6148",
+      "timestamp": "2026-11-14T08:17:20.964278",
+      "user_id": "local_user",
+      "task_id": "task_fba3122258"
     }
   ]
 }

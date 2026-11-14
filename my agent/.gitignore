@@ -14,3 +14,7 @@ uploads/
 outputs/
 backend/uploads/
 backend/outputs/
+chroma_db/
+backend/chroma_db/
+bm25_indices/
+backend/bm25_indices/

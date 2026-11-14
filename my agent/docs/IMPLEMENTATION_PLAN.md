@@ -218,3 +218,4 @@ The following architectural questions require explicit user guidance before comm
 3. **Database File Location:** Should the new SQLite database continue as `backend/taskfinisher_ai.db`, or be named `backend/research_platform.db` to reflect the TP01 target platform?
 4. **Existing Frontend Adaptation:** When we expose the new `/api/documents/upload`, `/api/research/chat`, and `/api/research/compare` endpoints, should we maintain backward-compatibility endpoints for the current frontend (`/api/tasks`, `/api/demo/*`) until the frontend is updated, or can we immediately focus backend routes on the target TP01 API?
 5. **Sample Research Papers:** For testing Phases 1 through 6, do you have specific PDF research papers in mind, or should we include 3 public open-access computer science/AI papers (e.g., Attention Is All You Need, LoRA, Toolformer) in `demos/sample_papers/` for repeatable testing?
+

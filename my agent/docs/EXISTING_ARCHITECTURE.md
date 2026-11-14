@@ -178,3 +178,4 @@ sequenceDiagram
 3. **No Programmatic Citation Verification:** The system checks whether steps completed, but never verifies whether a claimed quote matches verbatim text on a specific page of a PDF.
 4. **Monolithic Backend Design:** Two large files handle everything; domain logic cannot be tested in isolation.
 5. **No Migration Tooling:** Database changes require manual `ALTER TABLE` scripts instead of Alembic versions.
+
