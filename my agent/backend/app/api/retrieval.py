@@ -14,6 +14,7 @@ router = APIRouter(prefix="/retrieval", tags=["retrieval"])
 
 
 @router.post("/search", response_model=SearchResponse)
+@router.post("/search/", response_model=SearchResponse, include_in_schema=False)
 def hybrid_search(
     request: SearchRequest,
     db: Session = Depends(get_db),

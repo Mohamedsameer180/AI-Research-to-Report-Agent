@@ -168,6 +168,7 @@ def run_document_processing_pipeline(document_id: str, db: Session):
 
 
 @router.post("/upload", response_model=DocumentUploadResponse)
+@router.post("/upload/", response_model=DocumentUploadResponse, include_in_schema=False)
 async def upload_document(
     file: UploadFile = File(...),
     workspace_id: str = Form(settings.DEFAULT_WORKSPACE_ID),
@@ -313,6 +314,7 @@ async def batch_upload_documents(
 
 
 @router.get("", response_model=DocumentListResponse)
+@router.get("/", response_model=DocumentListResponse, include_in_schema=False)
 def list_documents(
     workspace_id: str = settings.DEFAULT_WORKSPACE_ID,
     user_id: Optional[str] = None,

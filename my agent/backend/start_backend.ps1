@@ -14,5 +14,11 @@ if (Test-Path ".env") {
 } else {
     Write-Host "No .env file found. The deterministic demo still works without live model calls."
 }
-Write-Host "Starting backend server..."
-python main.py
+$pythonExe = "python"
+if (Test-Path "C:\Users\HP\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe") {
+    $pythonExe = "C:\Users\HP\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe"
+} elseif (Test-Path ".venv\Scripts\python.exe") {
+    $pythonExe = ".venv\Scripts\python.exe"
+}
+Write-Host "Starting backend server using $pythonExe..."
+& $pythonExe main.py

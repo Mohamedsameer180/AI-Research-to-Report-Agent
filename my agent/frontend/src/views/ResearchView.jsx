@@ -69,15 +69,37 @@ export default function ResearchView({
         use_reranker: useReranker,
       }
 
-      const res = await fetch(`${apiBaseUrl}/api/retrieval/search`, {
+      const cleanBaseUrl = (apiBaseUrl || '').trim().replace(/\/+$/, '')
+      const searchUrl = cleanBaseUrl ? `${cleanBaseUrl}/api/retrieval/search` : '/api/retrieval/search'
+
+      let res = await fetch(searchUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      })
+      }).catch(() => null)
+
+      // Fallback to relative endpoint if absolute URL failed or 404'd
+      if ((!res || res.status === 404) && cleanBaseUrl) {
+        const fallback = await fetch('/api/retrieval/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(() => null)
+        if (fallback && fallback.ok) {
+          res = fallback
+        }
+      }
+
+      if (!res) {
+        throw new Error('Cannot connect to backend server. Please verify the backend is running on http://127.0.0.1:8000')
+      }
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.detail || 'Search failed')
+        if (res.status === 404) {
+          throw new Error('Retrieval endpoint not found (HTTP 404). Please ensure the backend server is running and restarted with the latest TP01 routes.')
+        }
+        throw new Error(err.detail || `Search request failed (HTTP ${res.status})`)
       }
 
       const data = await res.json()

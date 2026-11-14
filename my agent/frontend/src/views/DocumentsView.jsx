@@ -34,12 +34,16 @@ export default function DocumentsView({
   const fileInputRef = useRef(null)
 
   const currentWorkspace = workspaceId || 'default_workspace'
+  const cleanBaseUrl = (apiBaseUrl || '').trim().replace(/\/+$/, '')
 
   // Fetch documents for the active workspace
   const fetchDocuments = async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${apiBaseUrl}/api/documents?workspace_id=${encodeURIComponent(currentWorkspace)}`)
+      const url = cleanBaseUrl
+        ? `${cleanBaseUrl}/api/documents?workspace_id=${encodeURIComponent(currentWorkspace)}`
+        : `/api/documents?workspace_id=${encodeURIComponent(currentWorkspace)}`
+      const res = await fetch(url)
       if (res.ok) {
         const data = await res.json()
         setDocuments(data.documents || [])
@@ -82,7 +86,8 @@ export default function DocumentsView({
 
       if (files.length === 1) {
         formData.append('file', files[0])
-        const res = await fetch(`${apiBaseUrl}/api/documents/upload`, {
+        const uploadUrl = cleanBaseUrl ? `${cleanBaseUrl}/api/documents/upload` : '/api/documents/upload'
+        const res = await fetch(uploadUrl, {
           method: 'POST',
           body: formData,
         })
@@ -92,7 +97,8 @@ export default function DocumentsView({
         }
       } else {
         Array.from(files).forEach((f) => formData.append('files', f))
-        const res = await fetch(`${apiBaseUrl}/api/documents/batch-upload`, {
+        const batchUrl = cleanBaseUrl ? `${cleanBaseUrl}/api/documents/batch-upload` : '/api/documents/batch-upload'
+        const res = await fetch(batchUrl, {
           method: 'POST',
           body: formData,
         })
@@ -118,7 +124,8 @@ export default function DocumentsView({
     }
     onPlaySound?.('click')
     try {
-      const res = await fetch(`${apiBaseUrl}/api/documents/${docId}`, {
+      const delUrl = cleanBaseUrl ? `${cleanBaseUrl}/api/documents/${docId}` : `/api/documents/${docId}`
+      const res = await fetch(delUrl, {
         method: 'DELETE',
       })
       if (res.ok) {
@@ -134,7 +141,8 @@ export default function DocumentsView({
   const handleReprocess = async (docId) => {
     onPlaySound?.('click')
     try {
-      await fetch(`${apiBaseUrl}/api/documents/${docId}/process`, { method: 'POST' })
+      const procUrl = cleanBaseUrl ? `${cleanBaseUrl}/api/documents/${docId}/process` : `/api/documents/${docId}/process`
+      await fetch(procUrl, { method: 'POST' })
       fetchDocuments()
     } catch (err) {
       console.error('Reprocess failed:', err)
