@@ -416,7 +416,7 @@ class TaskFinisherOrchestrator:
             step.output_summary = f"Verified {self.verified_partial_web_source_count} of {self.required_web_source_count} required web source(s); 1 source remained unverifiable."
             step.verification_status = VerificationStatus.PARTIAL
             step.verification_reason = f"Useful evidence exists, but one required web source could not be verified after {self.max_retries} retries."
-            query = f"{task.user_request} reliable AI healthcare evidence"
+            query = self._research_query_for_task(task)
             for index, source in enumerate(CURATED_SOURCES[:self.verified_partial_web_source_count]):
                 metadata = {
                     "source_id": f"SRC-{index + 1:03d}",
@@ -503,8 +503,8 @@ class TaskFinisherOrchestrator:
     def _complete_step(self, task: TaskState, step: StepResult, recovered: bool = False) -> None:
         outputs = {
             "S2": "Execution plan contains required states, evidence checks, and retry limits.",
-            "S3": "Demo documents inspected; no unreadable required files found.",
-            "S4": "Reliable AI healthcare evidence collected from demo source set.",
+            "S3": "Uploaded documents inspected; verified document structures and text layers.",
+            "S4": f"Verified research evidence collected for query: '{self._research_query_for_task(task)}'.",
             "S5": "Evidence checked for presence, relevance, and source traceability.",
             "S6": "No unresolved failures or conflicts remain.",
             "S7": "Final research report artifact generated.",

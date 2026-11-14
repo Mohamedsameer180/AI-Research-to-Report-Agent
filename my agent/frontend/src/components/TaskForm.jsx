@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
 const examples = [
-  'Research the impact of AI in healthcare using reliable sources and create a professional report.',
-  'Compare reliable web sources and generate an evidence-backed summary.',
-  'Analyze uploaded documents, verify the findings, and produce a DOCX report.',
+  'Analyze uploaded research papers, extract methodologies and findings, and compare cross-document agreements and contradictions.',
+  'Investigate empirical results across multi-paper PDF literature with page-level citations.',
+  'Identify research gaps and synthesize findings from uploaded academic publications.',
 ]
 
 const scenarios = [
@@ -57,7 +57,7 @@ function TaskForm({ activeScenario, loading, onDemo, onScenarioChange, onSubmit 
         value={userRequest}
         onChange={(event) => setUserRequest(event.target.value)}
         rows="8"
-        placeholder="Research the impact of AI in healthcare using reliable sources and create a professional report."
+        placeholder="Analyze uploaded research papers, extract methodologies and findings, and compare cross-document agreements and contradictions."
         disabled={loading}
       />
 

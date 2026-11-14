@@ -103,7 +103,7 @@ export default function OverviewView({
           {/* Right Column: AI Agent Processing Core Animation */}
           <div className="lg:col-span-4 flex flex-col items-center justify-center p-2 rounded-2xl bg-black/40 border border-white/5 relative">
             <AiCore
-              status={isExecuting ? 'Cross-verifying healthcare adoption statistics...' : 'All verification gates sealed'}
+              status={isExecuting ? (taskResult?.current_operation || 'Autonomous agents analyzing research corpus...') : (taskResult ? 'Analysis complete' : 'Agent platform ready')}
               isWorking={isExecuting}
             />
           </div>
@@ -189,13 +189,13 @@ export default function OverviewView({
               </span>
               <span className="text-xs text-zinc-300 font-mono">
                 {isExecuting
-                  ? 'Current operation: "Cross-verifying healthcare adoption statistics..."'
+                  ? (taskResult?.current_operation || 'Autonomous agents processing document workflow...')
                   : isPartial
-                  ? 'Operation complete with 1 disclosed data gap (unverified secondary source).'
+                  ? 'Operation complete with disclosed data gap.'
                   : isWaitingHuman
-                  ? 'Execution paused at Step 5: Conflicting market estimates require human review.'
+                  ? 'Execution paused: Input required for resolution.'
                   : taskResult
-                  ? 'Task state loaded from the backend response.'
+                  ? 'Task state loaded from backend response.'
                   : 'No task is running. Start a task to populate live backend state.'
                 }
               </span>
